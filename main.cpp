@@ -310,6 +310,8 @@ void create_gui() {
 
 	ImGui::SliderFloat("Animation time", &animation_time, 0.1f, 100.0f, "%.3f", 1.0f);
 
+	ImGui::Checkbox("Draw cube", &(block->draw_cube));
+
 	if (ImGui::Button("Start Animation")) animate = true;
 	if (ImGui::Button("Stop Animation")) animate = false;
 	if (ImGui::Button("Restart Animation")) T = 0.0f;

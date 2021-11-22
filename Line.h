@@ -12,12 +12,10 @@ public:
 
     void AddPoint(glm::vec3 point);
     void Update() override;
-    void DeleteFirstPoint();
-    bool IsValidPath();
     int size() { return points_.size(); };
-    glm::vec3 GetFirstPoint();
-    glm::vec3 GetSecondPoint();
     void ClearPoints();
+    void SetColor(glm::vec4 col) { color = col; }
+    void SetLineWidth(float width_) { width = width_; }
 
     void Reverse();
 
@@ -28,6 +26,7 @@ private:
 
     std::vector<float> points_on_curve;
     std::vector<unsigned int> lines;
+    float width = 1.0f;
 
     std::vector<glm::vec3> points_;
 };

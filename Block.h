@@ -1,5 +1,6 @@
 #pragma once
 #include "Object.h"
+#include "Line.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -35,6 +36,8 @@ public:
     void DrawFrame(float T, glm::vec3 start_pos, glm::vec3 end_pos, glm::vec3 rotation_start, glm::vec3 rotation_end, bool aproximation_is_line = true);
     void DrawFrame(float T, glm::vec3 start_pos, glm::vec3 end_pos, glm::quat rotation_start, glm::quat rotation_end, bool aproximation_is_line = true);
 
+    bool draw_cube;
+
 private:
     void create_block_points();
     void update_object() override;
@@ -55,9 +58,13 @@ private:
     float x_delta;
     float y_delta;
 
+    std::shared_ptr<Line> przekontna;
+
     unsigned int texture;
     std::vector<float> points;
     std::vector<unsigned int> quads;
+
+
 
     glm::vec3 color;
 };

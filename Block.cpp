@@ -386,10 +386,29 @@ void Block::create_block_points()
 		points.push_back(0.0f);
 
 
+		//// Point xyz // 7
+		//points.push_back(0);
+		//points.push_back(0);
+		//points.push_back(0);
+		//// Normal xyz
+		//points.push_back(0.0f);
+		//points.push_back(0.0f);
+		//points.push_back(1.0f);
+
+		//// Point xyz // 1
+		//points.push_back(x_size);
+		//points.push_back(-y_size);
+		//points.push_back(z_size);
+		//// Normal xyz
+		//points.push_back(0.0f);
+		//points.push_back(0.0f);
+		//points.push_back(1.0f);
+
+
 
 	// Indexing triangles
-	for (int i = 0; i < points.size(); i++) {
-		quads.push_back(i);
+	for (int i = 0; i < points.size(); i+=6) {
+		quads.push_back(i/6);
 	}
 
 	blocks_need_creation = false;
@@ -434,6 +453,8 @@ void Block::update_object()
 		glUniform1f(z_sizePos, z_size);
 
 		blocks_need_creation = false;
+		przekontna->AddPoint({ 0,0,0 });
+		przekontna->AddPoint({ x_size,-y_size,z_size });
 	}
 
 }
@@ -446,6 +467,9 @@ Block::Block(float x_size_, float y_size_, float z_size_, int x_divisions_, int 
 	z_size = z_size_;
 	x_divisions = x_divisions_;
 	y_divisions = y_divisions_;
+	przekontna = std::make_shared<Line>(sh);
+	przekontna->SetColor({ 1,0,0,1 });
+	przekontna->SetLineWidth(5.0f);
 
 	shader = Shader("shader_tex.vs", "shader_tex.fs");
 	update_object();
@@ -463,35 +487,40 @@ void Block::DrawObject(glm::mat4 mvp)
 
 	glm::mat4 model = translate * rotate * resize;
 	glm::mat4 vp = mvp;
-	shader.use();
-	glm::mat4 trmodel = glm::transpose(glm::inverse(model));
-	int projectionLoc = glGetUniformLocation(shader.ID, "model");
-	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(model));
+	if (draw_cube) {
+		shader.use();
+		glm::mat4 trmodel = glm::transpose(glm::inverse(model));
+		int projectionLoc = glGetUniformLocation(shader.ID, "model");
+		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(model));
 
-	int trmodelLoc = glGetUniformLocation(shader.ID, "trmodel");
-	glUniformMatrix4fv(trmodelLoc, 1, GL_FALSE, glm::value_ptr(trmodel));
+		int trmodelLoc = glGetUniformLocation(shader.ID, "trmodel");
+		glUniformMatrix4fv(trmodelLoc, 1, GL_FALSE, glm::value_ptr(trmodel));
 
-	int mvLoc = glGetUniformLocation(shader.ID, "vp");
-	glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(vp));
+		int mvLoc = glGetUniformLocation(shader.ID, "vp");
+		glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(vp));
 
-	int viewPos = glGetUniformLocation(shader.ID, "viewPos");
-	glUniform3fv(viewPos, 1, &view_pos[0]);
-	
-	int colorPos = glGetUniformLocation(shader.ID, "color");
-	
+		int viewPos = glGetUniformLocation(shader.ID, "viewPos");
+		glUniform3fv(viewPos, 1, &view_pos[0]);
 
-	color = { 0.7,0.7,0 };
-	glUniform3fv(colorPos, 1, &color[0]);
+		int colorPos = glGetUniformLocation(shader.ID, "color");
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glDrawElements(GL_TRIANGLES, quads.size(), GL_UNSIGNED_INT, 0);
 
-	color = { 1,1,1 };
-	glUniform3fv(colorPos, 1, &color[0]);
-	glLineWidth(5.0f);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glDrawElements(GL_TRIANGLES, quads.size(), GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
+		color = { 0.7,0.7,0 };
+		glUniform3fv(colorPos, 1, &color[0]);
+
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDrawElements(GL_TRIANGLES, quads.size(), GL_UNSIGNED_INT, 0);
+
+		color = { 1,1,1 };
+		glUniform3fv(colorPos, 1, &color[0]);
+		glLineWidth(5.0f);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glDrawElements(GL_TRIANGLES, quads.size(), GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
+	}
+	else {
+		przekontna->DrawObject(model * mvp);
+	}
 	
 }
 
