@@ -154,6 +154,7 @@
   <ItemGroup>
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Cursor.cpp" />
     <ClCompile Include="Dependencies\include\ImGuiFileDialog-Lib_Only\ImGuiFileDialog.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="imgui_demo.cpp" />
@@ -171,6 +172,7 @@
   <ItemGroup>
     <ClInclude Include="Block.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Cursor.h" />
     <ClInclude Include="Dependencies\include\ImGuiFileDialog-Lib_Only\dirent\dirent.h" />
     <ClInclude Include="Dependencies\include\ImGuiFileDialog-Lib_Only\ImGuiFileDialog.h" />
     <ClInclude Include="Dependencies\include\ImGuiFileDialog-Lib_Only\ImGuiFileDialogConfig.h" />

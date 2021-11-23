@@ -16,6 +16,8 @@ void Line::DrawObject(glm::mat4 mvp_)
 	moved = false;
 	if (points_.size() < 2) return;
 
+	if (points_.size() > max_points) need_update = true;
+
 	if (need_update) {
 		update_object();
 		need_update = false;
@@ -55,6 +57,9 @@ void Line::Reverse()
 
 void Line::update_object()
 {
+	while (points_.size() > max_points && points_.size() > 0) {
+		points_.erase(points_.begin());
+	}
 	lines.clear();
 	points_on_curve.clear();
 	int k = 0;

@@ -17,19 +17,27 @@ void Block::Update()
 	need_update = true;
 }
 
-float Block::GetHeight(int x, int y)
+glm::vec3 Block::GetPoint()
 {
-	
-	if (x >= 0 && x < x_divisions && y >= 0 && y < y_divisions)
-		return data[y * x_divisions + x];
-	else
-		return -100.0f;
+	glm::mat4 model = translate * rotate * resize;
+	glm::vec3 lp = przekontna->GetLastPoint();
+	glm::vec4 lp4 = { lp.x,lp.y,lp.z,1 };
+	return lp4 * model;
 }
 
-void Block::SetHeight(int x, int y, float val)
+void Block::SetSize(float size)
 {
-	if (x >= 0 && x < x_divisions && y >= 0 && y < y_divisions)
-		data[y * x_divisions + x] = val;
+	x_size = size;
+	y_size = size;
+	z_size = size;
+	blocks_need_creation = true;
+	Update();
+}
+
+void Block::SetDenisity(float den)
+{
+	denisity = den;
+	// TODO on change recalculate inertia tensor
 }
 
 void Block::DrawFrame(float T, glm::vec3 start_pos, glm::vec3 end_pos, glm::vec3 rotation_start, glm::vec3 rotation_end, bool aproximation_is_line)
@@ -453,6 +461,7 @@ void Block::update_object()
 		glUniform1f(z_sizePos, z_size);
 
 		blocks_need_creation = false;
+		przekontna->ClearPoints();
 		przekontna->AddPoint({ 0,0,0 });
 		przekontna->AddPoint({ x_size,-y_size,z_size });
 	}
@@ -518,8 +527,10 @@ void Block::DrawObject(glm::mat4 mvp)
 		glDrawElements(GL_TRIANGLES, quads.size(), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 	}
-	else {
+	if(draw_diagonal) {
+		glDisable(GL_DEPTH_TEST);
 		przekontna->DrawObject(model * mvp);
+		glEnable(GL_DEPTH_TEST);
 	}
 	
 }

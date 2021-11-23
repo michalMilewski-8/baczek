@@ -31,12 +31,17 @@ public:
 
     void SetViewPos(glm::vec3 view_pos);
     void Update() override;
-    float GetHeight(int x, int y);
-    void SetHeight(int x, int y, float val);
+
+    glm::vec3 GetPoint();
+
+    void SetSize(float size);
+    void SetDenisity(float den);
+
     void DrawFrame(float T, glm::vec3 start_pos, glm::vec3 end_pos, glm::vec3 rotation_start, glm::vec3 rotation_end, bool aproximation_is_line = true);
     void DrawFrame(float T, glm::vec3 start_pos, glm::vec3 end_pos, glm::quat rotation_start, glm::quat rotation_end, bool aproximation_is_line = true);
 
-    bool draw_cube;
+    bool draw_cube =true;
+    bool draw_diagonal = true;
 
 private:
     void create_block_points();
@@ -49,6 +54,8 @@ private:
     float x_size;
     float y_size;
     float z_size;
+
+    float denisity = 1;
 
     std::vector<std::vector<float>> height_map;
     std::vector<float>data = {};

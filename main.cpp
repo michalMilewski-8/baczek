@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "Block.h"
+#include "Cursor.h"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -51,6 +52,7 @@ float speed = 0.2f; // speed of milling tool in milimeters per second;
 float size_x = 1;
 float size_y = 1;
 float size_z = 1;
+float denisity = 1;
 int divisions_x = 400;
 int divisions_y = 400;
 glm::vec3 translation_s;
@@ -59,7 +61,7 @@ glm::vec3 rot_euler_s;
 glm::vec3 rot_euler_e;
 glm::quat quaternion_s = {0,0,0,1};
 glm::quat quaternion_e = {0,0,0,1};
-bool is_linear_aprox = true;
+bool draw_trajectory = false;
 
 Camera cam;
 Shader ourShader;
@@ -70,7 +72,8 @@ GLFWwindow* window2;
 
 std::vector<std::shared_ptr<Object>> objects_list = {};
 std::unique_ptr<Block> block;
-std::unique_ptr<Block> block2;
+std::unique_ptr<Cursor> cursor;
+std::unique_ptr<Line> trajectory;
 
 void draw_scene();
 void draw_scene2();
@@ -144,6 +147,8 @@ int main() {
 	glEnable(GL_DEPTH_TEST);
 
 	block = std::make_unique<Block>(size_x, size_y, size_z, divisions_x, divisions_y, ourShader);
+	cursor = std::make_unique<Cursor>(ourShader);
+	trajectory = std::make_unique<Line>(ourShader);
 	
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -196,6 +201,15 @@ int main() {
 void draw_scene() {
 	//block->DrawFrame(T, translation_s, translation_e, quaternion_s, quaternion_e, is_linear_aprox);
 	block->DrawObject(mvp);
+	cursor->DrawObject(mvp);
+	
+	if (draw_trajectory) {
+		trajectory->DrawObject(mvp);
+		trajectory->AddPoint(block->GetPoint());
+	}
+	else {
+		trajectory->ClearPoints();
+	}
 }
 
 #pragma region  boilerCodeOpenGL
@@ -295,22 +309,13 @@ void create_gui() {
 	//flags |= ImGuiWindowFlags_MenuBar;
 	ImGui::Begin("Main Menu##uu", &open, flags);
 
-	ImGui::InputFloat3("Start Position", (float*)&translation_s);
-	ImGui::InputFloat3("End Position", (float*)&translation_e);
-	if (ImGui::InputFloat3("Euler rotation start", (float*)&rot_euler_s)) quaternion_s = Block::EulerToQuaternion(rot_euler_s);
-	if (ImGui::InputFloat3("Euler rotation end", (float*)&rot_euler_e)) quaternion_e = Block::EulerToQuaternion(rot_euler_e);
-	if (ImGui::InputFloat4("Quaternion start", (float*)&quaternion_s)) {
-		quaternion_s = glm::normalize(quaternion_s);
-		rot_euler_s = Block::QuaternionToEuler(quaternion_s); 
-	}
-	if (ImGui::InputFloat4("Quaternion end", (float*)&quaternion_e)) {
-		quaternion_e = glm::normalize(quaternion_e);
-		rot_euler_e = Block::QuaternionToEuler(quaternion_e);
-	};
-
-	ImGui::SliderFloat("Animation time", &animation_time, 0.1f, 100.0f, "%.3f", 1.0f);
+	if (ImGui::InputFloat("Size of cube", &size_x)) block->SetSize(size_x);
+	if (ImGui::InputFloat("Denisity of cube", &denisity)) block->SetSize(size_x);
+	ImGui::InputInt("Max points on trajectory", &(trajectory->max_points));
 
 	ImGui::Checkbox("Draw cube", &(block->draw_cube));
+	ImGui::Checkbox("Draw diagonal", &(block->draw_diagonal));
+	ImGui::Checkbox("Draw trajectory", &draw_trajectory);
 
 	if (ImGui::Button("Start Animation")) animate = true;
 	if (ImGui::Button("Stop Animation")) animate = false;

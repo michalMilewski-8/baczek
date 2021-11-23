@@ -16,8 +16,11 @@ public:
     void ClearPoints();
     void SetColor(glm::vec4 col) { color = col; }
     void SetLineWidth(float width_) { width = width_; }
+    glm::vec3 GetLastPoint() { return points_.size() > 0 ? points_.back() : glm::vec3(0,0,0); };
 
     void Reverse();
+
+    int max_points = 100;
 
     static unsigned int counter;
 private:
@@ -27,6 +30,7 @@ private:
     std::vector<float> points_on_curve;
     std::vector<unsigned int> lines;
     float width = 1.0f;
+   
 
     std::vector<glm::vec3> points_;
 };
