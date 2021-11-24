@@ -466,6 +466,31 @@ void Block::recalc_tensor(float size)
 	tensor[2][2] = 11.0f * pow5 / 12;
 }
 
+glm::quat Block::quat_x_vec(glm::quat q, glm::vec3 v)
+{
+	glm::mat3x4 m;
+
+	m[0][0] = -q.x;
+	m[1][0] = -q.y;
+	m[2][0] = -q.z;
+
+	m[0][1] = q.w;
+	m[1][1] = -q.z;
+	m[2][1] = q.y;
+
+	m[0][2] = q.z;
+	m[1][2] = q.w;
+	m[2][2] = -q.x;
+
+	m[0][3] = -q.y;
+	m[1][3] = q.x;
+	m[2][3] = q.w;
+
+	glm::vec4 w = m * v;
+
+	return glm::quat(w[0], w[1], w[2], w[3]);
+}
+
 Block::Block(float x_size_, float y_size_, float z_size_, int x_divisions_, int y_divisions_, Shader sh) :
 	Object(sh, 6)
 {
