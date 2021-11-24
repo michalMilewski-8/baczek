@@ -46,6 +46,7 @@ public:
 private:
     void create_block_points();
     void update_object() override;
+    void recalc_tensor(float size);
 
 
     int x_divisions;
@@ -74,5 +75,6 @@ private:
 
 
     glm::vec3 color;
+    glm::mat3 tensor;
 };
 

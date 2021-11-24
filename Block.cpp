@@ -31,6 +31,7 @@ void Block::SetSize(float size)
 	y_size = size;
 	z_size = size;
 	blocks_need_creation = true;
+	recalc_tensor(size);
 	Update();
 }
 
@@ -43,7 +44,7 @@ void Block::SetDenisity(float den)
 void Block::DrawFrame(glm::mat4 mvp, float T, float angle)
 {
 	float angle_rad = M_PI * angle / 180.0f;
-	glm::quat q = glm::angleAxis(angle_rad, glm::vec3(0.0f,0.0f,-1.0f));
+	glm::quat q = glm::angleAxis(angle_rad, glm::vec3(0.0f, 0.0f, -1.0f));
 	this->RotateObject(q);
 	DrawObject(mvp);
 }
@@ -454,6 +455,15 @@ void Block::update_object()
 		przekontna->AddPoint({ x_size,-y_size,z_size });
 	}
 
+}
+
+void Block::recalc_tensor(float size)
+{
+	float pow5 = pow(size, 5);
+	tensor = glm::mat3(1.0f);
+	tensor[0][0] = 11.0f * pow5 / 12;
+	tensor[1][1] = pow5 / 6;
+	tensor[2][2] = 11.0f * pow5 / 12;
 }
 
 Block::Block(float x_size_, float y_size_, float z_size_, int x_divisions_, int y_divisions_, Shader sh) :
