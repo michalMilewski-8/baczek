@@ -9,6 +9,8 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <math.h>
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include <vector>
 
 #include "Block.h"
@@ -37,15 +39,18 @@ int e = 0;
 glm::mat4 projection, view, model, mvp;
 glm::mat4 projection_i, view_i, model_i, mvp_i;
 glm::vec2 mousePosOld, angle;
+float start_angle = 45.0f;
+float angular_speed_ = 1.0f;
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 float ipd = 0.01f;
 float d = 0.1f;
 float near = 0.01f;
-float far = 20.0f;
+float far = 200.0f;
 bool animate = false;
 float T = 0.0f;
 float animation_time = 1.0f;
+int iteration_per_frame = 10;
 
 float distance_d = 1.0f;
 float speed = 0.2f; // speed of milling tool in milimeters per second;
@@ -150,6 +155,15 @@ int main() {
 	cursor = std::make_unique<Cursor>(ourShader);
 	trajectory = std::make_unique<Line>(ourShader);
 
+	{
+		block->SetAngularSpeed(angular_speed_);
+		float angle_rad = M_PI * start_angle / 180.0f;
+		glm::quat q = glm::angleAxis(angle_rad, glm::vec3(0.0f, 0.0f, -1.0f));
+		block->RotateObject(q);
+		block->SetDenisity(denisity);
+		block->SetSize(size_x);
+	}
+
 	// render loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -199,8 +213,16 @@ int main() {
 }
 
 void draw_scene() {
-	block->DrawFrame(mvp, 0, 45.0f);
-	//block->DrawObject(mvp);
+	if (animate) {
+		float delta = deltaTime / iteration_per_frame;
+		for (int i = 0; i < iteration_per_frame; i++) {
+			block->CalculateFrame(delta);
+		}
+		block->DrawFrame(mvp);
+	}
+	else {
+		block->DrawObject(mvp);
+	}
 	cursor->DrawObject(mvp);
 
 	if (draw_trajectory) {
@@ -310,16 +332,33 @@ void create_gui() {
 	ImGui::Begin("Main Menu##uu", &open, flags);
 
 	if (ImGui::InputFloat("Size of cube", &size_x)) block->SetSize(size_x);
-	if (ImGui::InputFloat("Denisity of cube", &denisity)) block->SetSize(size_x);
+	if (ImGui::InputFloat("Denisity of cube", &denisity)) block->SetDenisity(denisity);
 	ImGui::InputInt("Max points on trajectory", &(trajectory->max_points));
+
+	if (ImGui::InputFloat("Starting angle", &start_angle)) {
+		float angle_rad = M_PI * start_angle / 180.0f;
+		glm::quat q = glm::angleAxis(angle_rad, glm::vec3(0.0f, 0.0f, -1.0f));
+		block->RotateObject(q);
+	}
+	if (ImGui::InputFloat("Starting angular speed", &angular_speed_)) {
+		block->SetAngularSpeed(angular_speed_);
+	}
 
 	ImGui::Checkbox("Draw cube", &(block->draw_cube));
 	ImGui::Checkbox("Draw diagonal", &(block->draw_diagonal));
 	ImGui::Checkbox("Draw trajectory", &draw_trajectory);
+	ImGui::InputInt("Iterations per frame", &iteration_per_frame);
 
 	if (ImGui::Button("Start Animation")) animate = true;
 	if (ImGui::Button("Stop Animation")) animate = false;
-	if (ImGui::Button("Restart Animation")) T = 0.0f;
+	if (ImGui::Button("Restart Animation")) {
+		float angle_rad = M_PI * start_angle / 180.0f;
+		glm::quat q = glm::angleAxis(angle_rad, glm::vec3(0.0f, 0.0f, -1.0f));
+		block->RotateObject(q);
+		block->SetAngularSpeed(angular_speed_);
+		block->SetDenisity(denisity);
+		block->SetSize(size_x);
+	}
 
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::End();

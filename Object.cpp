@@ -117,7 +117,6 @@ void Object::RotateObject(glm::quat rotation)
 	quaternion_rotation = rotation;
 
 	rotate = glm::mat4(1.0f);
-
 	rotate[0][0] = 1 - 2 * quaternion_rotation.y * quaternion_rotation.y - 2 * quaternion_rotation.z * quaternion_rotation.z;
 	rotate[0][1] = 2 * quaternion_rotation.x * quaternion_rotation.y + 2 * quaternion_rotation.w * quaternion_rotation.z;
 	rotate[0][2] = 2 * quaternion_rotation.x * quaternion_rotation.z - 2 * quaternion_rotation.w * quaternion_rotation.y;

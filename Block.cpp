@@ -22,7 +22,7 @@ glm::vec3 Block::GetPoint()
 	glm::mat4 model = translate * rotate * resize;
 	glm::vec3 lp = przekontna->GetLastPoint();
 	glm::vec4 lp4 = { lp.x,lp.y,lp.z,1 };
-	return lp4 * model;
+	return model*lp4;
 }
 
 void Block::SetSize(float size)
@@ -38,14 +38,22 @@ void Block::SetSize(float size)
 void Block::SetDenisity(float den)
 {
 	denisity = den;
-	// TODO on change recalculate inertia tensor
+	recalc_tensor(x_size);
 }
 
-void Block::DrawFrame(glm::mat4 mvp, float T, float angle)
+void Block::SetAngularSpeed(float sp)
 {
-	float angle_rad = M_PI * angle / 180.0f;
-	glm::quat q = glm::angleAxis(angle_rad, glm::vec3(0.0f, 0.0f, -1.0f));
-	this->RotateObject(q);
+	angular_speed.y = sp;
+}
+
+void Block::CalculateFrame(float T)
+{
+	runge_kutta_next_step(T, angular_speed, rotation_, angular_speed, rotation_);
+}
+
+void Block::DrawFrame(glm::mat4 mvp)
+{
+	this->RotateObject(rotation_);
 	DrawObject(mvp);
 }
 
@@ -465,27 +473,32 @@ void Block::recalc_tensor(float size)
 	tensor[1][1] = pow5 / 6;
 	tensor[2][2] = 11.0f * pow5 / 12;
 
+	tensor = tensor * denisity;
+
 	tensor_inv = glm::inverse(tensor);
+	calculate_mass();
 }
 
 void Block::runge_kutta_next_step(float h, glm::vec3 w, glm::quat q, glm::vec3& w_next, glm::quat& q_next)
 {
-	auto w_k1 = w;
-	auto q_k1 = q;
-
+	glm::vec3 w_k1; glm::quat q_k1;
 	glm::vec3 w_k2; glm::quat q_k2;
 	glm::vec3 w_k3; glm::quat q_k3;
 	glm::vec3 w_k4; glm::quat q_k4;
 
-	calculate_f(h / 2, w, q,
+	calculate_f(h / 2,
+		w, q,
+		w_k1, q_k1);
+
+	calculate_f(h / 2,
 		w + h * w_k1 / 2.0f, q + h * q_k1 / 2.0f,
 		w_k2, q_k2);
 
-	calculate_f(h / 2, w, q,
+	calculate_f(h / 2,
 		w + h * w_k2 / 2.0f, q + h * q_k2 / 2.0f,
 		w_k3, q_k3);
 
-	calculate_f(h, w, q,
+	calculate_f(h,
 		w + h * w_k3, q + h * q_k3,
 		w_k4, q_k4);
 
@@ -494,12 +507,24 @@ void Block::runge_kutta_next_step(float h, glm::vec3 w, glm::quat q, glm::vec3& 
 	q_next = glm::normalize(q + h * (q_k1 + 2.0f * q_k2 + 2.0f * q_k3 + q_k4));
 }
 
-void Block::calculate_f(float h, glm::vec3 w_prev, glm::quat q_prev, glm::vec3 w, glm::quat q, glm::vec3& w_res, glm::quat& q_res)
+void Block::calculate_f(float h, glm::vec3 w, glm::quat q, glm::vec3& w_res, glm::quat& q_res)
 {
 	//TODO calculate N
-	glm::vec3 N;
+	glm::vec3 N = {0,0,0};
+	
+	if (gravity) {
+		N.y = -mass * 9.8123f;
+		N = /*glm::inverse(glm::normalize(q)) * */N * glm::normalize(q);
+		N = glm::cross(glm::vec3(0, x_size * 1.73205080757f, 0),N);
+	}
+
 	w_res = tensor_inv * (N + glm::cross(tensor * w, w));
-	q_res = glm::normalize(quat_x_vec(q, w) / 2.0f);
+	q_res = quat_x_vec(q, w) / 2.0f;
+}
+
+void Block::calculate_mass()
+{
+	mass = x_size * x_size * x_size * denisity;
 }
 
 glm::quat Block::quat_x_vec(glm::quat q, glm::vec3 v)
@@ -596,7 +621,9 @@ void Block::DrawObject(glm::mat4 mvp)
 
 void Block::RotateObject(glm::quat q)
 {
-	glm::quat q1 = RotationBetweenVectors(glm::vec3(1.0f, -1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	q = glm::normalize(q);
+	rotation_ = q;
+	glm::quat q1 = glm::normalize(RotationBetweenVectors(glm::vec3(1.0f, -1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
 	Object::RotateObject(q * q1);
 }
 

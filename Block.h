@@ -37,18 +37,22 @@ public:
 
 	void SetSize(float size);
 	void SetDenisity(float den);
+	void SetAngularSpeed(float sp);
 
-	void DrawFrame(glm::mat4 mvp, float T, float angle);
+	void DrawFrame(glm::mat4 mvp);
+	void CalculateFrame(float T);
 
 	bool draw_cube = true;
 	bool draw_diagonal = true;
+	bool gravity = true;
 
 private:
 	void create_block_points();
 	void update_object() override;
 	void recalc_tensor(float size);
 	void runge_kutta_next_step(float h, glm::vec3 w, glm::quat q, glm::vec3& w_next, glm::quat& q_next);
-	void calculate_f(float h, glm::vec3 w_prev, glm::quat q_prev, glm::vec3 w, glm::quat q, glm::vec3& w_res, glm::quat& q_res);
+	void calculate_f(float h, glm::vec3 w, glm::quat q, glm::vec3& w_res, glm::quat& q_res);
+	void calculate_mass();
 	glm::quat quat_x_vec(glm::quat q, glm::vec3 v);
 
 	int x_divisions;
@@ -70,9 +74,15 @@ private:
 
 	std::shared_ptr<Line> przekontna;
 
+	glm::quat rotation_;
+	glm::vec3 angular_speed = {0,0,0};
+	float mass = 1.0f;
+
 	unsigned int texture;
 	std::vector<float> points;
 	std::vector<unsigned int> quads;
+
+
 
 
 
