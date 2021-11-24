@@ -15,6 +15,7 @@
 
 #include "Block.h"
 #include "Cursor.h"
+#include "Grid.h"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -70,7 +71,7 @@ bool draw_trajectory = false;
 
 Camera cam;
 Shader ourShader;
-Shader ourShader2;
+std::unique_ptr<Grid> gridShader;
 GLFWwindow* window;
 GLFWwindow* window2;
 //std::unique_ptr<Cursor> cursor, center;
@@ -148,8 +149,11 @@ int main() {
 	// build and compile our shader program
 	// ------------------------------------
 	ourShader = Shader("shader.vs", "shader.fs"); // you can name your shader files however you like
-
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	gridShader = std::make_unique<Grid>();
 
 	block = std::make_unique<Block>(size_x, size_y, size_z, divisions_x, divisions_y, ourShader);
 	cursor = std::make_unique<Cursor>(ourShader);
@@ -188,6 +192,9 @@ int main() {
 
 		draw_scene();
 
+		// Render the grid
+		gridShader->Draw(projection, view, projection_i, view_i);
+
 		// Render dear imgui into screen
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -213,6 +220,7 @@ int main() {
 }
 
 void draw_scene() {
+
 	if (animate) {
 		float delta = deltaTime / iteration_per_frame;
 		for (int i = 0; i < iteration_per_frame; i++) {

@@ -60,6 +60,9 @@
     <ClCompile Include="Cursor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Grid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -131,11 +134,16 @@
     <ClInclude Include="Virtual.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Grid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader.vs" />
     <None Include="shader.fs" />
     <None Include="shader_tex.vs" />
     <None Include="shader_tex.fs" />
+    <None Include="shader_grid.fs" />
+    <None Include="shader_grid.vs" />
   </ItemGroup>
 </Project>

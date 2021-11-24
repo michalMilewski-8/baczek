@@ -43,6 +43,7 @@ void Camera::SetOrthographic(float left, float right, float top, float bottom, f
 
 void Camera::SetPerspective(float fov_y, float aspect, float near, float far)
 {
+	
 	glm::mat4 persp = glm::mat4(1.0f);
 	float e = 1 / tan(fov_y / 2);
 	persp[1][1] = e;
@@ -52,11 +53,11 @@ void Camera::SetPerspective(float fov_y, float aspect, float near, float far)
 	persp[3][3] = 0;
 	persp[2][3] = -1;
 	m_projection_matrix = persp;
-
 }
 
 void Camera::LookAt(glm::vec3 pos, glm::vec3 front, glm::vec3 up)
 {
+	
 	this->pos = pos;
 	this->front = front;
 	this->up = up;
@@ -81,6 +82,7 @@ void Camera::LookAt(glm::vec3 pos, glm::vec3 front, glm::vec3 up)
 	Result[3][1] = -glm::dot(u, pos);
 	Result[3][2] = glm::dot(f, pos);
 	m_view_matrix = Result;
+	//m_view_matrix = glm::lookAt(pos, front, up);
 }
 
 

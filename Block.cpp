@@ -41,8 +41,8 @@ void Block::SetDenisity(float den)
 	recalc_tensor(x_size);
 }
 
-void Block::SetAngularSpeed(float sp)
-{
+void Block::SetAngularSpeed(float sp) 
+{                                                                                                                         
 	angular_speed.y = sp;
 }
 
