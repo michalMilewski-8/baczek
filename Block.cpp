@@ -464,6 +464,42 @@ void Block::recalc_tensor(float size)
 	tensor[0][0] = 11.0f * pow5 / 12;
 	tensor[1][1] = pow5 / 6;
 	tensor[2][2] = 11.0f * pow5 / 12;
+
+	tensor_inv = glm::inverse(tensor);
+}
+
+void Block::runge_kutta_next_step(float h, glm::vec3 w, glm::quat q, glm::vec3& w_next, glm::quat& q_next)
+{
+	auto w_k1 = w;
+	auto q_k1 = q;
+
+	glm::vec3 w_k2; glm::quat q_k2;
+	glm::vec3 w_k3; glm::quat q_k3;
+	glm::vec3 w_k4; glm::quat q_k4;
+
+	calculate_f(h / 2, w, q,
+		w + h * w_k1 / 2.0f, q + h * q_k1 / 2.0f,
+		w_k2, q_k2);
+
+	calculate_f(h / 2, w, q,
+		w + h * w_k2 / 2.0f, q + h * q_k2 / 2.0f,
+		w_k3, q_k3);
+
+	calculate_f(h, w, q,
+		w + h * w_k3, q + h * q_k3,
+		w_k4, q_k4);
+
+	h = h / 6.0f;
+	w_next = w + h * (w_k1 + 2.0f * w_k2 + 2.0f * w_k3 + w_k4);
+	q_next = glm::normalize(q + h * (q_k1 + 2.0f * q_k2 + 2.0f * q_k3 + q_k4));
+}
+
+void Block::calculate_f(float h, glm::vec3 w_prev, glm::quat q_prev, glm::vec3 w, glm::quat q, glm::vec3& w_res, glm::quat& q_res)
+{
+	//TODO calculate N
+	glm::vec3 N;
+	w_res = tensor_inv * (N + glm::cross(tensor * w, w));
+	q_res = glm::normalize(quat_x_vec(q, w) / 2.0f);
 }
 
 glm::quat Block::quat_x_vec(glm::quat q, glm::vec3 v)

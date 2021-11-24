@@ -47,6 +47,8 @@ private:
 	void create_block_points();
 	void update_object() override;
 	void recalc_tensor(float size);
+	void runge_kutta_next_step(float h, glm::vec3 w, glm::quat q, glm::vec3& w_next, glm::quat& q_next);
+	void calculate_f(float h, glm::vec3 w_prev, glm::quat q_prev, glm::vec3 w, glm::quat q, glm::vec3& w_res, glm::quat& q_res);
 	glm::quat quat_x_vec(glm::quat q, glm::vec3 v);
 
 	int x_divisions;
@@ -76,5 +78,6 @@ private:
 
 	glm::vec3 color;
 	glm::mat3 tensor;
+	glm::mat3 tensor_inv;
 };
 
