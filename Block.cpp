@@ -517,7 +517,7 @@ void Block::DrawObject(glm::mat4 mvp)
 	}
 	if (draw_diagonal) {
 		glDisable(GL_DEPTH_TEST);
-		przekontna->DrawObject(model * mvp);
+		przekontna->DrawObject(mvp * model);
 		glEnable(GL_DEPTH_TEST);
 	}
 
