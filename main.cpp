@@ -59,8 +59,8 @@ glm::vec3 translation_s;
 glm::vec3 translation_e;
 glm::vec3 rot_euler_s;
 glm::vec3 rot_euler_e;
-glm::quat quaternion_s = {0,0,0,1};
-glm::quat quaternion_e = {0,0,0,1};
+glm::quat quaternion_s = { 0,0,0,1 };
+glm::quat quaternion_e = { 0,0,0,1 };
 bool draw_trajectory = false;
 
 Camera cam;
@@ -149,7 +149,7 @@ int main() {
 	block = std::make_unique<Block>(size_x, size_y, size_z, divisions_x, divisions_y, ourShader);
 	cursor = std::make_unique<Cursor>(ourShader);
 	trajectory = std::make_unique<Line>(ourShader);
-	
+
 	// render loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -199,10 +199,10 @@ int main() {
 }
 
 void draw_scene() {
-	//block->DrawFrame(T, translation_s, translation_e, quaternion_s, quaternion_e, is_linear_aprox);
-	block->DrawObject(mvp);
+	block->DrawFrame(mvp, 0, 45.0f);
+	//block->DrawObject(mvp);
 	cursor->DrawObject(mvp);
-	
+
 	if (draw_trajectory) {
 		trajectory->DrawObject(mvp);
 		trajectory->AddPoint(block->GetPoint());

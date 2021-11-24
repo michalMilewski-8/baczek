@@ -12,12 +12,12 @@ glm::quat Object::RotationBetweenVectors(glm::vec3 start, glm::vec3 dest) {
 	float s = sqrt((1 + cosTheta) * 2);
 	float invs = 1 / s;
 
-	return glm::quat(
+	return glm::normalize(glm::quat(
 		s * 0.5f,
 		rotationAxis.x * invs,
 		rotationAxis.y * invs,
 		rotationAxis.z * invs
-	);
+	));
 
 }
 

@@ -18,6 +18,7 @@ public:
     Block(float x_size_, float y_size_, float z_size_, int x_divisions_, int y_divisions_, Shader sh);
 
     void DrawObject(glm::mat4 mvp) override;
+    void RotateObject(glm::quat q) override;
 
     static glm::quat EulerToQuaternion(glm::vec3 rot);
     static glm::vec3 QuaternionToEuler(glm::quat quat);
@@ -37,8 +38,7 @@ public:
     void SetSize(float size);
     void SetDenisity(float den);
 
-    void DrawFrame(float T, glm::vec3 start_pos, glm::vec3 end_pos, glm::vec3 rotation_start, glm::vec3 rotation_end, bool aproximation_is_line = true);
-    void DrawFrame(float T, glm::vec3 start_pos, glm::vec3 end_pos, glm::quat rotation_start, glm::quat rotation_end, bool aproximation_is_line = true);
+    void DrawFrame(glm::mat4 mvp, float T, float angle);
 
     bool draw_cube =true;
     bool draw_diagonal = true;

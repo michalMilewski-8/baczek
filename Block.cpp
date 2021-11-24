@@ -4,7 +4,7 @@
 
 glm::vec3 Block::TransformToDivisions(glm::vec3 pos) const
 {
-	return {  std::round((pos.x / (double)x_size + 0.5f) * (x_divisions - 1)),std::round((pos.y / (double)y_size + 0.5f) * (y_divisions - 1)),pos.z };
+	return { std::round((pos.x / (double)x_size + 0.5f) * (x_divisions - 1)),std::round((pos.y / (double)y_size + 0.5f) * (y_divisions - 1)),pos.z };
 }
 
 void Block::SetViewPos(glm::vec3 view_pos)
@@ -40,383 +40,371 @@ void Block::SetDenisity(float den)
 	// TODO on change recalculate inertia tensor
 }
 
-void Block::DrawFrame(float T, glm::vec3 start_pos, glm::vec3 end_pos, glm::vec3 rotation_start, glm::vec3 rotation_end, bool aproximation_is_line)
+void Block::DrawFrame(glm::mat4 mvp, float T, float angle)
 {
-	rotate = glm::mat4(0.0f);
-
-	if (aproximation_is_line) {
-		this->MoveObjectTo(start_pos + (end_pos - start_pos) * T);
-		this->RotateObject(EulerToQuaternion(rotation_start + (rotation_end - rotation_start) * T));
-	}
-}
-
-void Block::DrawFrame(float T, glm::vec3 start_pos, glm::vec3 end_pos, glm::quat rotation_start, glm::quat rotation_end, bool aproximation_is_line)
-{
-	rotate = glm::mat4(0.0f);
-
-	if (aproximation_is_line) {
-		this->MoveObjectTo(start_pos + (end_pos - start_pos) * T);
-		this->RotateObject(rotation_start + (rotation_end - rotation_start) * T);
-	}
+	float angle_rad = M_PI * angle / 180.0f;
+	glm::quat q = glm::angleAxis(angle_rad, glm::vec3(0.0f,0.0f,-1.0f));
+	this->RotateObject(q);
+	DrawObject(mvp);
 }
 
 void Block::create_block_points()
 {
 
-		// Point xyz // 0
-		points.push_back(0);
-		points.push_back(-y_size);
-		points.push_back(z_size);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(0.0f);
-		points.push_back(1.0f);
+	// Point xyz // 0
+	points.push_back(0);
+	points.push_back(-y_size);
+	points.push_back(z_size);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(0.0f);
+	points.push_back(1.0f);
 
-		// Point xyz // 4
-		points.push_back(0);
-		points.push_back(0);
-		points.push_back(z_size);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(0.0f);
-		points.push_back(1.0f);
+	// Point xyz // 4
+	points.push_back(0);
+	points.push_back(0);
+	points.push_back(z_size);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(0.0f);
+	points.push_back(1.0f);
 
-		// Point xyz // 1
-		points.push_back(x_size);
-		points.push_back(-y_size);
-		points.push_back(z_size);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(0.0f);
-		points.push_back(1.0f);
+	// Point xyz // 1
+	points.push_back(x_size);
+	points.push_back(-y_size);
+	points.push_back(z_size);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(0.0f);
+	points.push_back(1.0f);
 
-		// Point xyz // 1
-		points.push_back(x_size);
-		points.push_back(-y_size);
-		points.push_back(z_size);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(0.0f);
-		points.push_back(1.0f);
+	// Point xyz // 1
+	points.push_back(x_size);
+	points.push_back(-y_size);
+	points.push_back(z_size);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(0.0f);
+	points.push_back(1.0f);
 
-		// Point xyz // 4
-		points.push_back(0);
-		points.push_back(0);
-		points.push_back(z_size);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(0.0f);
-		points.push_back(1.0f);
+	// Point xyz // 4
+	points.push_back(0);
+	points.push_back(0);
+	points.push_back(z_size);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(0.0f);
+	points.push_back(1.0f);
 
-		// Point xyz // 5
-		points.push_back(x_size);
-		points.push_back(0);
-		points.push_back(z_size);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(0.0f);
-		points.push_back(1.0f);
+	// Point xyz // 5
+	points.push_back(x_size);
+	points.push_back(0);
+	points.push_back(z_size);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(0.0f);
+	points.push_back(1.0f);
 
-		// Point xyz // 1
-		points.push_back(x_size);
-		points.push_back(-y_size);
-		points.push_back(z_size);
-		// Normal xyz
-		points.push_back(1.0f);
-		points.push_back(0.0f);
-		points.push_back(0.0f);
+	// Point xyz // 1
+	points.push_back(x_size);
+	points.push_back(-y_size);
+	points.push_back(z_size);
+	// Normal xyz
+	points.push_back(1.0f);
+	points.push_back(0.0f);
+	points.push_back(0.0f);
 
-		// Point xyz // 5
-		points.push_back(x_size);
-		points.push_back(0);
-		points.push_back(z_size);
-		// Normal xyz
-		points.push_back(1.0f);
-		points.push_back(0.0f);
-		points.push_back(0.0f);
+	// Point xyz // 5
+	points.push_back(x_size);
+	points.push_back(0);
+	points.push_back(z_size);
+	// Normal xyz
+	points.push_back(1.0f);
+	points.push_back(0.0f);
+	points.push_back(0.0f);
 
-		// Point xyz // 6
-		points.push_back(x_size);
-		points.push_back(0);
-		points.push_back(0);
-		// Normal xyz
-		points.push_back(1.0f);
-		points.push_back(0.0f);
-		points.push_back(0.0f);
+	// Point xyz // 6
+	points.push_back(x_size);
+	points.push_back(0);
+	points.push_back(0);
+	// Normal xyz
+	points.push_back(1.0f);
+	points.push_back(0.0f);
+	points.push_back(0.0f);
 
-		// Point xyz // 1
-		points.push_back(x_size);
-		points.push_back(-y_size);
-		points.push_back(z_size);
-		// Normal xyz
-		points.push_back(1.0f);
-		points.push_back(0.0f);
-		points.push_back(0.0f);
+	// Point xyz // 1
+	points.push_back(x_size);
+	points.push_back(-y_size);
+	points.push_back(z_size);
+	// Normal xyz
+	points.push_back(1.0f);
+	points.push_back(0.0f);
+	points.push_back(0.0f);
 
-		// Point xyz // 6
-		points.push_back(x_size);
-		points.push_back(0);
-		points.push_back(0);
-		// Normal xyz
-		points.push_back(1.0f);
-		points.push_back(0.0f);
-		points.push_back(0.0f);
+	// Point xyz // 6
+	points.push_back(x_size);
+	points.push_back(0);
+	points.push_back(0);
+	// Normal xyz
+	points.push_back(1.0f);
+	points.push_back(0.0f);
+	points.push_back(0.0f);
 
-		// Point xyz // 2
-		points.push_back(x_size);
-		points.push_back(-y_size);
-		points.push_back(0);
-		// Normal xyz
-		points.push_back(1.0f);
-		points.push_back(0.0f);
-		points.push_back(0.0f);
+	// Point xyz // 2
+	points.push_back(x_size);
+	points.push_back(-y_size);
+	points.push_back(0);
+	// Normal xyz
+	points.push_back(1.0f);
+	points.push_back(0.0f);
+	points.push_back(0.0f);
 
-		// Point xyz // 0
-		points.push_back(0);
-		points.push_back(-y_size);
-		points.push_back(z_size);
-		// Normal xyz
-		points.push_back(-1.0f);
-		points.push_back(0.0f);
-		points.push_back(0.0f);
+	// Point xyz // 0
+	points.push_back(0);
+	points.push_back(-y_size);
+	points.push_back(z_size);
+	// Normal xyz
+	points.push_back(-1.0f);
+	points.push_back(0.0f);
+	points.push_back(0.0f);
 
-		// Point xyz // 3
-		points.push_back(0);
-		points.push_back(-y_size);
-		points.push_back(0);
-		// Normal xyz
-		points.push_back(-1.0f);
-		points.push_back(0.0f);
-		points.push_back(0.0f);
+	// Point xyz // 3
+	points.push_back(0);
+	points.push_back(-y_size);
+	points.push_back(0);
+	// Normal xyz
+	points.push_back(-1.0f);
+	points.push_back(0.0f);
+	points.push_back(0.0f);
 
-		// Point xyz // 4
-		points.push_back(0);
-		points.push_back(0);
-		points.push_back(z_size);
-		// Normal xyz
-		points.push_back(-1.0f);
-		points.push_back(0.0f);
-		points.push_back(0.0f);
-
-
-		// Point xyz // 3
-		points.push_back(0);
-		points.push_back(-y_size);
-		points.push_back(0);
-		// Normal xyz
-		points.push_back(-1.0f);
-		points.push_back(0.0f);
-		points.push_back(0.0f);
-
-		// Point xyz // 7
-		points.push_back(0);
-		points.push_back(0);
-		points.push_back(0);
-		// Normal xyz
-		points.push_back(-1.0f);
-		points.push_back(0.0f);
-		points.push_back(0.0f);
-
-		// Point xyz // 4
-		points.push_back(0);
-		points.push_back(0);
-		points.push_back(z_size);
-		// Normal xyz
-		points.push_back(-1.0f);
-		points.push_back(0.0f);
-		points.push_back(0.0f);
+	// Point xyz // 4
+	points.push_back(0);
+	points.push_back(0);
+	points.push_back(z_size);
+	// Normal xyz
+	points.push_back(-1.0f);
+	points.push_back(0.0f);
+	points.push_back(0.0f);
 
 
-		// Point xyz // 7
-		points.push_back(0);
-		points.push_back(0);
-		points.push_back(0);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(0.0f);
-		points.push_back(-1.0f);
+	// Point xyz // 3
+	points.push_back(0);
+	points.push_back(-y_size);
+	points.push_back(0);
+	// Normal xyz
+	points.push_back(-1.0f);
+	points.push_back(0.0f);
+	points.push_back(0.0f);
 
-		// Point xyz // 3
-		points.push_back(0);
-		points.push_back(-y_size);
-		points.push_back(0);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(0.0f);
-		points.push_back(-1.0f);
+	// Point xyz // 7
+	points.push_back(0);
+	points.push_back(0);
+	points.push_back(0);
+	// Normal xyz
+	points.push_back(-1.0f);
+	points.push_back(0.0f);
+	points.push_back(0.0f);
 
-		// Point xyz // 6
-		points.push_back(x_size);
-		points.push_back(0);
-		points.push_back(0);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(0.0f);
-		points.push_back(-1.0f);
-
-		// Point xyz // 6
-		points.push_back(x_size);
-		points.push_back(0);
-		points.push_back(0);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(0.0f);
-		points.push_back(-1.0f);
-
-		// Point xyz // 3
-		points.push_back(0);
-		points.push_back(-y_size);
-		points.push_back(0);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(0.0f);
-		points.push_back(-1.0f);
-
-		// Point xyz // 2
-		points.push_back(x_size);
-		points.push_back(-y_size);
-		points.push_back(0);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(0.0f);
-		points.push_back(-1.0f);
+	// Point xyz // 4
+	points.push_back(0);
+	points.push_back(0);
+	points.push_back(z_size);
+	// Normal xyz
+	points.push_back(-1.0f);
+	points.push_back(0.0f);
+	points.push_back(0.0f);
 
 
-		// Point xyz // 4
-		points.push_back(0);
-		points.push_back(0);
-		points.push_back(z_size);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(1.0f);
-		points.push_back(0.0f);
+	// Point xyz // 7
+	points.push_back(0);
+	points.push_back(0);
+	points.push_back(0);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(0.0f);
+	points.push_back(-1.0f);
 
-		// Point xyz // 7
-		points.push_back(0);
-		points.push_back(0);
-		points.push_back(0);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(1.0f);
-		points.push_back(0.0f);
+	// Point xyz // 3
+	points.push_back(0);
+	points.push_back(-y_size);
+	points.push_back(0);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(0.0f);
+	points.push_back(-1.0f);
 
-		// Point xyz // 6
-		points.push_back(x_size);
-		points.push_back(0);
-		points.push_back(0);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(1.0f);
-		points.push_back(0.0f);
+	// Point xyz // 6
+	points.push_back(x_size);
+	points.push_back(0);
+	points.push_back(0);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(0.0f);
+	points.push_back(-1.0f);
 
+	// Point xyz // 6
+	points.push_back(x_size);
+	points.push_back(0);
+	points.push_back(0);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(0.0f);
+	points.push_back(-1.0f);
 
-		// Point xyz // 5
-		points.push_back(x_size);
-		points.push_back(0);
-		points.push_back(z_size);
-		// Normal xyz
-		points.push_back(1.0f);
-		points.push_back(0.0f);
-		points.push_back(0.0f);
+	// Point xyz // 3
+	points.push_back(0);
+	points.push_back(-y_size);
+	points.push_back(0);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(0.0f);
+	points.push_back(-1.0f);
 
-		// Point xyz // 4
-		points.push_back(0);
-		points.push_back(0);
-		points.push_back(z_size);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(1.0f);
-		points.push_back(0.0f);
-
-		// Point xyz // 6
-		points.push_back(x_size);
-		points.push_back(0);
-		points.push_back(0);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(1.0f);
-		points.push_back(0.0f);
-
-
-		// Point xyz // 0
-		points.push_back(0);
-		points.push_back(-y_size);
-		points.push_back(z_size);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(-1.0f);
-		points.push_back(0.0f);
-
-		// Point xyz // 1
-		points.push_back(x_size);
-		points.push_back(-y_size);
-		points.push_back(z_size);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(-1.0f);
-		points.push_back(0.0f);
-
-		// Point xyz // 3
-		points.push_back(0);
-		points.push_back(-y_size);
-		points.push_back(0);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(-1.0f);
-		points.push_back(0.0f);
+	// Point xyz // 2
+	points.push_back(x_size);
+	points.push_back(-y_size);
+	points.push_back(0);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(0.0f);
+	points.push_back(-1.0f);
 
 
-		// Point xyz // 1
-		points.push_back(x_size);
-		points.push_back(-y_size);
-		points.push_back(z_size);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(-1.0f);
-		points.push_back(0.0f);
+	// Point xyz // 4
+	points.push_back(0);
+	points.push_back(0);
+	points.push_back(z_size);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(1.0f);
+	points.push_back(0.0f);
 
-		// Point xyz // 2
-		points.push_back(x_size);
-		points.push_back(-y_size);
-		points.push_back(0);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(-1.0f);
-		points.push_back(0.0f);
+	// Point xyz // 7
+	points.push_back(0);
+	points.push_back(0);
+	points.push_back(0);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(1.0f);
+	points.push_back(0.0f);
 
-		// Point xyz // 3
-		points.push_back(0);
-		points.push_back(-y_size);
-		points.push_back(0);
-		// Normal xyz
-		points.push_back(0.0f);
-		points.push_back(-1.0f);
-		points.push_back(0.0f);
-
-
-		//// Point xyz // 7
-		//points.push_back(0);
-		//points.push_back(0);
-		//points.push_back(0);
-		//// Normal xyz
-		//points.push_back(0.0f);
-		//points.push_back(0.0f);
-		//points.push_back(1.0f);
-
-		//// Point xyz // 1
-		//points.push_back(x_size);
-		//points.push_back(-y_size);
-		//points.push_back(z_size);
-		//// Normal xyz
-		//points.push_back(0.0f);
-		//points.push_back(0.0f);
-		//points.push_back(1.0f);
+	// Point xyz // 6
+	points.push_back(x_size);
+	points.push_back(0);
+	points.push_back(0);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(1.0f);
+	points.push_back(0.0f);
 
 
+	// Point xyz // 5
+	points.push_back(x_size);
+	points.push_back(0);
+	points.push_back(z_size);
+	// Normal xyz
+	points.push_back(1.0f);
+	points.push_back(0.0f);
+	points.push_back(0.0f);
 
-	// Indexing triangles
-	for (int i = 0; i < points.size(); i+=6) {
-		quads.push_back(i/6);
+	// Point xyz // 4
+	points.push_back(0);
+	points.push_back(0);
+	points.push_back(z_size);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(1.0f);
+	points.push_back(0.0f);
+
+	// Point xyz // 6
+	points.push_back(x_size);
+	points.push_back(0);
+	points.push_back(0);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(1.0f);
+	points.push_back(0.0f);
+
+
+	// Point xyz // 0
+	points.push_back(0);
+	points.push_back(-y_size);
+	points.push_back(z_size);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(-1.0f);
+	points.push_back(0.0f);
+
+	// Point xyz // 1
+	points.push_back(x_size);
+	points.push_back(-y_size);
+	points.push_back(z_size);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(-1.0f);
+	points.push_back(0.0f);
+
+	// Point xyz // 3
+	points.push_back(0);
+	points.push_back(-y_size);
+	points.push_back(0);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(-1.0f);
+	points.push_back(0.0f);
+
+
+	// Point xyz // 1
+	points.push_back(x_size);
+	points.push_back(-y_size);
+	points.push_back(z_size);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(-1.0f);
+	points.push_back(0.0f);
+
+	// Point xyz // 2
+	points.push_back(x_size);
+	points.push_back(-y_size);
+	points.push_back(0);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(-1.0f);
+	points.push_back(0.0f);
+
+	// Point xyz // 3
+	points.push_back(0);
+	points.push_back(-y_size);
+	points.push_back(0);
+	// Normal xyz
+	points.push_back(0.0f);
+	points.push_back(-1.0f);
+	points.push_back(0.0f);
+
+
+	//// Point xyz // 7
+	//points.push_back(0);
+	//points.push_back(0);
+	//points.push_back(0);
+	//// Normal xyz
+	//points.push_back(0.0f);
+	//points.push_back(0.0f);
+	//points.push_back(1.0f);
+
+	//// Point xyz // 1
+	//points.push_back(x_size);
+	//points.push_back(-y_size);
+	//points.push_back(z_size);
+	//// Normal xyz
+	//points.push_back(0.0f);
+	//points.push_back(0.0f);
+	//points.push_back(1.0f);
+
+
+
+// Indexing triangles
+	for (int i = 0; i < points.size(); i += 6) {
+		quads.push_back(i / 6);
 	}
 
 	blocks_need_creation = false;
@@ -527,12 +515,18 @@ void Block::DrawObject(glm::mat4 mvp)
 		glDrawElements(GL_TRIANGLES, quads.size(), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 	}
-	if(draw_diagonal) {
+	if (draw_diagonal) {
 		glDisable(GL_DEPTH_TEST);
 		przekontna->DrawObject(model * mvp);
 		glEnable(GL_DEPTH_TEST);
 	}
-	
+
+}
+
+void Block::RotateObject(glm::quat q)
+{
+	glm::quat q1 = RotationBetweenVectors(glm::vec3(1.0f, -1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	Object::RotateObject(q * q1);
 }
 
 glm::quat Block::EulerToQuaternion(glm::vec3 rot)

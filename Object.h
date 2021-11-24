@@ -35,7 +35,7 @@ public:
 	void MoveObject(glm::vec3 movement);
 	void MoveObjectTo(glm::vec3 movement);
 	void RotateObject(glm::vec3 movement);
-	void RotateObject(glm::quat rotation);
+	virtual void RotateObject(glm::quat rotation);
 	void ResizeObject(glm::vec3 movement);
 	virtual void Select();
 	virtual void UnSelect();
