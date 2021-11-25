@@ -10,33 +10,33 @@ Grid::Grid()
 	points = {};
 	triangles = {};
 
-	points.push_back(-1);
-	points.push_back(-1);
+	points.push_back(-100);
 	points.push_back(0);
+	points.push_back(-100);
 
 
-	points.push_back(1);
-	points.push_back(-1);
+	points.push_back(100);
 	points.push_back(0);
+	points.push_back(-100);
 
 
-	points.push_back(1);
-	points.push_back(1);
+	points.push_back(100);
 	points.push_back(0);
+	points.push_back(100);
 
 
-	points.push_back(-1);
-	points.push_back(1);
+	points.push_back(-100);
 	points.push_back(0);
+	points.push_back(100);
 
 
 	triangles.push_back(0);
-	triangles.push_back(2);
 	triangles.push_back(1);
-
-	triangles.push_back(0);
 	triangles.push_back(3);
+
+	triangles.push_back(1);
 	triangles.push_back(2);
+	triangles.push_back(3);
 
 	shader.use();
 	// 1. bind Vertex Array Object
