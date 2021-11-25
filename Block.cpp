@@ -514,7 +514,7 @@ void Block::calculate_f(float h, glm::vec3 w, glm::quat q, glm::vec3& w_res, glm
 	
 	if (gravity) {
 		N.y = -mass * 9.8123f;
-		N = -glm::normalize(q) * N * glm::normalize(q);
+		N = -glm::normalize(q) * glm::vec4(N,0.0f) * glm::normalize(q);
 		N = glm::cross(glm::vec3(glm::normalize(q)*glm::vec4(0, x_size * 1.73205080757f, 0,0)),N);
 	}
 

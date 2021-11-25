@@ -351,6 +351,8 @@ void create_gui() {
 	if (ImGui::InputFloat("Starting angular speed", &angular_speed_)) {
 		block->SetAngularSpeed(angular_speed_);
 	}
+	ImGui::Checkbox("Gravity", &(block->gravity));
+
 
 	ImGui::Checkbox("Draw cube", &(block->draw_cube));
 	ImGui::Checkbox("Draw diagonal", &(block->draw_diagonal));
