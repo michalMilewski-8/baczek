@@ -59,6 +59,7 @@ float size_x = 1;
 float size_y = 1;
 float size_z = 1;
 float denisity = 1;
+float timeSpeed = 1;
 int divisions_x = 400;
 int divisions_y = 400;
 glm::vec3 translation_s;
@@ -222,7 +223,7 @@ int main() {
 void draw_scene() {
 
 	if (animate) {
-		float delta = deltaTime / iteration_per_frame;
+		float delta = timeSpeed * deltaTime / iteration_per_frame;
 		for (int i = 0; i < iteration_per_frame; i++) {
 			block->CalculateFrame(delta);
 		}
@@ -339,6 +340,7 @@ void create_gui() {
 	//flags |= ImGuiWindowFlags_MenuBar;
 	ImGui::Begin("Main Menu##uu", &open, flags);
 
+	ImGui::SliderFloat("Time speed modifier", &timeSpeed,0.5f,20.0f);
 	if (ImGui::InputFloat("Size of cube", &size_x)) block->SetSize(size_x);
 	if (ImGui::InputFloat("Denisity of cube", &denisity)) block->SetDenisity(denisity);
 	ImGui::InputInt("Max points on trajectory", &(trajectory->max_points));
