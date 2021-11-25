@@ -22,7 +22,7 @@ void Line::DrawObject(glm::mat4 mvp_)
 		update_object();
 		need_update = false;
 	}
-	mvp = mvp_;
+	mvp = mvp_ * translate * rotate;
 	shader.use();
 	int projectionLoc = glGetUniformLocation(shader.ID, "mvp");
 	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(mvp));

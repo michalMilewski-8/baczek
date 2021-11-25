@@ -73,6 +73,7 @@ private:
 	float y_delta;
 
 	std::shared_ptr<Line> przekontna;
+	std::shared_ptr<Line> gravity_vec;
 
 	glm::quat rotation_;
 	glm::vec3 angular_speed = {0,0,0};
@@ -83,7 +84,7 @@ private:
 	std::vector<unsigned int> quads;
 
 
-
+	glm::vec3 center_of_mass;
 
 
 	glm::vec3 color;

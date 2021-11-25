@@ -461,6 +461,7 @@ void Block::update_object()
 		przekontna->ClearPoints();
 		przekontna->AddPoint({ 0,0,0 });
 		przekontna->AddPoint({ x_size,-y_size,z_size });
+		calculate_mass();
 	}
 
 }
@@ -525,6 +526,15 @@ void Block::calculate_f(float h, glm::vec3 w, glm::quat q, glm::vec3& w_res, glm
 void Block::calculate_mass()
 {
 	mass = x_size * x_size * x_size * denisity;
+	center_of_mass = glm::vec3(0.5, -0.5, 0.5) * x_size;
+
+	gravity_vec->ClearPoints();
+	gravity_vec->AddPoint(center_of_mass);
+	gravity_vec->AddPoint(center_of_mass - glm::vec3(0, mass /2.0f , 0));
+	gravity_vec->AddPoint(center_of_mass - glm::vec3(-0.05f * mass,mass/2.0f - 0.05f * mass,0));
+	gravity_vec->AddPoint(center_of_mass - glm::vec3(0, mass / 2.0f, 0));
+	gravity_vec->AddPoint(center_of_mass - glm::vec3(0.05f * mass, mass / 2.0f - 0.05f * mass, 0));
+	gravity_vec->AddPoint(center_of_mass - glm::vec3(0, mass / 2.0f, 0));
 }
 
 glm::quat Block::quat_x_vec(glm::quat q, glm::vec3 v)
@@ -563,6 +573,10 @@ Block::Block(float x_size_, float y_size_, float z_size_, int x_divisions_, int 
 	przekontna = std::make_shared<Line>(sh);
 	przekontna->SetColor({ 1,0,0,1 });
 	przekontna->SetLineWidth(5.0f);
+
+	gravity_vec = std::make_shared<Line>(sh);
+	gravity_vec->SetColor({ 0,0.8,1,1 });
+	gravity_vec->SetLineWidth(3.0f);
 
 	shader = Shader("shader_tex.vs", "shader_tex.fs");
 	update_object();
@@ -614,6 +628,12 @@ void Block::DrawObject(glm::mat4 mvp)
 	if (draw_diagonal) {
 		glDisable(GL_DEPTH_TEST);
 		przekontna->DrawObject(mvp * model);
+		glEnable(GL_DEPTH_TEST);
+	}
+	if (gravity) {
+		glDisable(GL_DEPTH_TEST);
+		gravity_vec->MoveObjectTo(glm::vec3(model * glm::vec4(center_of_mass,0)) - center_of_mass);
+		gravity_vec->DrawObject(mvp);
 		glEnable(GL_DEPTH_TEST);
 	}
 
