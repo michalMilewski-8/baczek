@@ -43,7 +43,7 @@ void Block::SetDenisity(float den)
 
 void Block::SetAngularSpeed(float sp) 
 {                                                                                                                         
-	angular_speed.y = sp;
+	angular_speed = { 0,sp,0 };
 }
 
 void Block::CalculateFrame(float T)
