@@ -515,7 +515,7 @@ void Block::calculate_f(float h, glm::vec3 w, glm::quat q, glm::vec3& w_res, glm
 	if (gravity) {
 		N.y = -mass * 9.8123f;
 		N = /*glm::inverse(glm::normalize(q)) * */N * glm::normalize(q);
-		N = glm::cross(glm::vec3(0, x_size * 1.73205080757f, 0),N);
+		N = glm::cross(glm::normalize(q)*glm::vec3(0, x_size * 1.73205080757f, 0),N);
 	}
 
 	w_res = tensor_inv * (N + glm::cross(tensor * w, w));
