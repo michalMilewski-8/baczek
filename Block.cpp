@@ -22,7 +22,7 @@ glm::vec3 Block::GetPoint()
 	glm::mat4 model = translate * rotate * resize;
 	glm::vec3 lp = przekontna->GetLastPoint();
 	glm::vec4 lp4 = { lp.x,lp.y,lp.z,1 };
-	return model*lp4;
+	return model * lp4;
 }
 
 void Block::SetSize(float size)
@@ -41,8 +41,8 @@ void Block::SetDenisity(float den)
 	recalc_tensor(x_size);
 }
 
-void Block::SetAngularSpeed(float sp) 
-{                                                                                                                         
+void Block::SetAngularSpeed(float sp)
+{
 	angular_speed = { 0,sp,0 };
 }
 
@@ -511,12 +511,14 @@ void Block::runge_kutta_next_step(float h, glm::vec3 w, glm::quat q, glm::vec3& 
 void Block::calculate_f(float h, glm::vec3 w, glm::quat q, glm::vec3& w_res, glm::quat& q_res)
 {
 	//TODO calculate N
-	glm::vec3 N = {0,0,0};
-	
+	glm::vec3 N = { 0,0,0 };
+
+
+
 	if (gravity) {
 		N.y = -mass * 9.8123f;
-		N = -glm::normalize(q) * glm::vec4(N,0.0f) * glm::normalize(q);
-		N = glm::cross(glm::vec3(glm::normalize(q)*glm::vec4(0, x_size * 1.73205080757f, 0,0)),N);
+		N = glm::rotate(glm::inverse(q), N);
+		N = glm::cross(glm::rotate(q, glm::vec3(0, x_size * 1.73205080757f, 0)), N);
 	}
 
 	w_res = tensor_inv * (N + glm::cross(tensor * w, w));
@@ -530,8 +532,8 @@ void Block::calculate_mass()
 
 	gravity_vec->ClearPoints();
 	gravity_vec->AddPoint(center_of_mass);
-	gravity_vec->AddPoint(center_of_mass - glm::vec3(0, mass /2.0f , 0));
-	gravity_vec->AddPoint(center_of_mass - glm::vec3(-0.05f * mass,mass/2.0f - 0.05f * mass,0));
+	gravity_vec->AddPoint(center_of_mass - glm::vec3(0, mass / 2.0f, 0));
+	gravity_vec->AddPoint(center_of_mass - glm::vec3(-0.05f * mass, mass / 2.0f - 0.05f * mass, 0));
 	gravity_vec->AddPoint(center_of_mass - glm::vec3(0, mass / 2.0f, 0));
 	gravity_vec->AddPoint(center_of_mass - glm::vec3(0.05f * mass, mass / 2.0f - 0.05f * mass, 0));
 	gravity_vec->AddPoint(center_of_mass - glm::vec3(0, mass / 2.0f, 0));
@@ -632,7 +634,7 @@ void Block::DrawObject(glm::mat4 mvp)
 	}
 	if (gravity) {
 		glDisable(GL_DEPTH_TEST);
-		gravity_vec->MoveObjectTo(glm::vec3(model * glm::vec4(center_of_mass,0)) - center_of_mass);
+		gravity_vec->MoveObjectTo(glm::vec3(model * glm::vec4(center_of_mass, 0)) - center_of_mass);
 		gravity_vec->DrawObject(mvp);
 		glEnable(GL_DEPTH_TEST);
 	}
